@@ -21,3 +21,11 @@ class Fenetre:
     def defTaille(self, h,l):
         self.hauteur=h
         self.largeur=l
+    def hauteur(self):
+        return self.hauteur()
+    def largeur(self):
+        return self.largeur()
+    def couleur(self):
+        return self.couleur
+    def fps(self):
+        return self.fps
