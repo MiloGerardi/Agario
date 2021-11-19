@@ -1,4 +1,4 @@
-from pygame.math import Vect
+from pygame.math import Vector2
 
 class Creep:
     def __init__(self, largeur=800, hauteur=800):
