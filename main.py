@@ -1,13 +1,15 @@
 import core
 import creep
 from creep import Creep
+from fenetre import Fenetre
 
 
 def setup():
-    print("setup START______")
-    core.fps = 30
-    core.WINDOW_SIZE = [800, 800]
-    print("setup END______")
+    f = Fenetre()
+    f.defTaille(800,800)
+    f.defFps(60)
+    f.defCouleur((255,255,255))
+    f.set(core)
 
     core.memory("listcreep", [])
     core.memory("nbcreep", 100)

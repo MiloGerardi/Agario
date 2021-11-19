@@ -6,6 +6,7 @@ from types import FrameType
 
 import pygame
 
+bgColor=(0,0,0)
 screenCleen = True
 runfuntion = None
 setupfunction = None
@@ -109,6 +110,7 @@ def run():
 
 def main(setupf, runf):
     print(inspect.stack()[1].function)
+
     global runfuntion
     runfuntion = runf
     global setupfunction
@@ -126,7 +128,7 @@ def main(setupf, runf):
         if not loopLock:
             if screenCleen:
                 screenCleen = False
-                screen.fill(0)
+                screen.fill(bgColor)
             run()
 
         for event in pygame.event.get():  # User did something
