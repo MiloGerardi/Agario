@@ -29,3 +29,8 @@ class Fenetre:
         return self.couleur
     def fps(self):
         return self.fps
+class Cercle :
+    def calcul_air(self, r):
+        return 3.14*r*r
+    def calcul_perimetre(self, r):
+        return 2*3.14*r
