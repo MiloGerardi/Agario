@@ -1,12 +1,15 @@
+import copy
 import inspect
 import sys
-import time
-from typing import cast
-from types import FrameType
+from math import *
+from random import *
 
 import pygame
 
-bgColor=(0,0,0)
+import core
+
+title = "Fenetre"
+bgColor = (0, 0, 0)
 screenCleen = True
 runfuntion = None
 setupfunction = None
@@ -25,6 +28,7 @@ keyPressValue = None
 keyReleaseValue = None
 keyPressList = None
 memoryStorage = {}
+keyReleaseList = None
 
 
 def printMemory():
@@ -48,6 +52,16 @@ def memory(key, value=None):
         except:
             sys.stderr.write("ERREUR : Nom de variable inconnue : " + key)
             sys.exit()
+
+
+def setTitle(t):
+    global title
+    title = t
+
+
+def setBgColor(c):
+    global bgColor
+    bgColor = c
 
 
 def noLoop():
@@ -76,8 +90,17 @@ def getkeyPress():
 
 def getKeyPressList(value):
     if keyPressList is not None:
-        if len(keyPressList) > value:
-            return keyPressList[value] == 1
+        key = getattr(pygame, 'K_' + str(value))
+        if len(keyPressList) > key:
+            return keyPressList[key] == 1
+    return False
+
+
+def getKeyReleaseList(value):
+    if keyReleaseList is not None:
+        key = getattr(pygame, 'K_' + str(value))
+        if len(keyReleaseList) > key:
+            return keyReleaseList[key] != 0
     return False
 
 
@@ -98,9 +121,8 @@ def setup():
 
     global screen
     screen = pygame.display.set_mode(WINDOW_SIZE)
-
     # Set title of screen
-    pygame.display.set_caption("Window")
+    pygame.display.set_caption(title)
 
 
 def run():
@@ -110,12 +132,11 @@ def run():
 
 def main(setupf, runf):
     print(inspect.stack()[1].function)
-
     global runfuntion
     runfuntion = runf
     global setupfunction
     setupfunction = setupf
-    global keyPressList, screenCleen, mouseclickleft, mouseclickL, mouseclickright, mouseclickR, keyPress, keyPressValue, keyReleaseValue, screen
+    global keyPressList, keyReleaseList, screenCleen, mouseclickleft, mouseclickL, mouseclickright, mouseclickR, keyPress, keyPressValue, keyReleaseValue, screen
 
     setup()
 
@@ -129,7 +150,11 @@ def main(setupf, runf):
             if screenCleen:
                 screenCleen = False
                 screen.fill(bgColor)
+                pygame.display.set_caption(title)
             run()
+
+        if keyReleaseList is not None:
+            keyReleaseList = [i - 1 if i > 0 else 0 for i in keyReleaseList]
 
         for event in pygame.event.get():  # User did something
             if event.type == pygame.QUIT:  # If user clicked close
@@ -139,8 +164,20 @@ def main(setupf, runf):
                 keyPress = True
                 keyPressValue = event.key
 
+
             elif event.type == pygame.KEYUP:
                 keyPressValue = None
+                if keyReleaseList is None:
+                    keyReleaseList = [0 for i in keyPressList]
+
+                for i, k in enumerate(keyPressList):
+                    if k == True and event.scancode == i:
+                        keyReleaseList[event.key] = 1
+
+
+
+
+
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
 
@@ -167,7 +204,9 @@ def main(setupf, runf):
                     mouseclickright = event.pos
 
             if hasattr(event, 'key'):
+
                 keyPressList = pygame.key.get_pressed()
+
                 if keyPressValue:
                     keyReleaseValue = event.key
                 else:
@@ -178,3 +217,69 @@ def main(setupf, runf):
         # print(clock.get_time())
         # Go ahead and update the screen with what we 've drawn.
         pygame.display.flip()
+
+
+class Math:
+    def map(value, istart, istop, ostart, ostop):
+        return ostart + (ostop - ostart) * ((value - istart) / (istop - istart))
+
+
+class Draw:
+    def rect(color, rect, width=0):
+        if len(color) > 3:
+            shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
+            pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
+            core.screen.blit(shape_surf, rect)
+        else:
+            pygame.draw.rect(core.screen, color, rect, width)
+
+    def circle(color, center, radius, width=0):
+        if len(color) > 3:
+            target_rect = pygame.Rect(center, (0, 0)).inflate((radius * 2, radius * 2))
+            shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
+            pygame.draw.circle(shape_surf, color, (radius, radius), radius, width)
+            core.screen.blit(shape_surf, target_rect)
+        else:
+            pygame.draw.circle(core.screen, color, center, radius, width)
+
+    def polyline(color, points, width=0):
+        pygame.draw.polygon(core.screen, color, points, width)
+
+    def line(color, start_pos, end_pos, width=1):
+        pygame.draw.line(core.screen, color, start_pos, end_pos, width)
+
+    def ellipse(color, rect, width=0):
+
+        if len(color) > 3:
+            shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
+            pygame.draw.ellipse(shape_surf, color, shape_surf.get_rect(), width)
+            core.screen.blit(shape_surf, rect)
+        else:
+            pygame.draw.ellipse(core.screen, color, rect, width)
+
+    def arc(color, rect, start_angle, stop_angle, width=1):
+        pygame.draw.arc(core.screen, color, rect, start_angle, stop_angle, width)
+
+    def lines(color, closed, points, width=1):
+        pygame.draw.lines(core.screen, color, closed, points, width)
+
+    def polygon(color, points, width=0):
+        if len(color) > 3:
+            lx, ly = zip(*points)
+            min_x, min_y, max_x, max_y = min(lx), min(ly), max(lx), max(ly)
+            target_rect = pygame.Rect(min_x, min_y, max_x - min_x, max_y - min_y)
+            shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
+            pygame.draw.polygon(shape_surf, color, [(x - min_x, y - min_y) for x, y in points])
+            core.screen.blit(shape_surf, target_rect)
+        else:
+            pygame.draw.polygon(core.screen, color, points, width)
+
+    def text(color, texte, position, taille=30, font='Comic Sans MS'):
+        pygame.font.init()
+        myfont = pygame.font.SysFont('Comic Sans MS', taille)
+        textsurface = myfont.render(texte, False, color)
+        screen.blit(textsurface, position)
+        return myfont.size(texte)
+
+
+

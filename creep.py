@@ -13,6 +13,7 @@ class Creep:
     def update(self):
         self.position.x = random.randint(self.taille, core.WINDOW_SIZE[0]-self.taille)
         self.position.y = random.randint(self.taille, core.WINDOW_SIZE[1]-self.taille)
+        self.couleur = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
     def show (self,screen):
         pygame.draw.circle(screen,self.couleur,[int(self.position.x),int(self.position.y)],self.taille)

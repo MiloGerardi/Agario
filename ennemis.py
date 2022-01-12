@@ -12,8 +12,6 @@ class Ennemi:
         self.couleur = (255,0,0)
         self.vitesse = Vector2(0,0)
         self.vitesseMax = 0
-        self.nom = ""
-        self.score = 0
         self.target = Vector2(0,0)
 
     def calculVitesse(self):
@@ -32,6 +30,7 @@ class Ennemi:
             self.vitesse.x = 0
         if self.position.y+self.vitesse.y+self.rayon >= core.WINDOW_SIZE[1] or self.position.y+self.vitesse.y-self.rayon <= 0:
             self.vitesse.y = 0
+        self.remiseSurTerrain()
         self.position += self.vitesse
     def calculRayon(self):
         self.rayon = round(math.sqrt((self.masse*2)/3.14))
@@ -63,3 +62,14 @@ class Ennemi:
             self.mangerCreep(creeps)
     def setPosition(self, p):
         self.position = p
+    def getMass(self):
+        return self.masse
+    def remiseSurTerrain(self):
+        if self.position.x-self.rayon<=0 :
+            self.position.x=self.rayon+1
+        elif self.position.x+self.rayon>=core.WINDOW_SIZE[0] :
+            self.position.x=core.WINDOW_SIZE[0]-self.rayon-1
+        if self.position.y-self.rayon<=0 :
+            self.position.y=self.rayon+1
+        elif self.position.y+self.rayon>=core.WINDOW_SIZE[1] :
+            self.position.y=core.WINDOW_SIZE[1]-self.rayon-1
