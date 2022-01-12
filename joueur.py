@@ -8,7 +8,7 @@ class Joueur:
     def __init__(self):
         self.rayon = 0
         self.position = Vector2(core.WINDOW_SIZE[0]/2,core.WINDOW_SIZE[1]/2)
-        self.masse = 800
+        self.masse = 400
         self.couleur = (0,0,0)
         self.vitesse = Vector2(0,0)
         self.vitesseMax = 0
@@ -22,14 +22,12 @@ class Joueur:
         pygame.draw.circle(surface, self.couleur, [int(self.position.x), int(self.position.y)], self.rayon)
         self.textSize = core.Draw.text((200,200,200), self.nom, (self.position.x-self.textSize[0]/2, self.position.y-self.textSize[1]/2), 20)
 
-    def setTextSize(self):
-        self.textSize = core.Draw.text((200,200,200), self.nom, (self.position.x-self.rayon/2, self.position.y-self.rayon/2), 20)
-
     def deplacer(self):
         if core.getMouseLeftClick() is not None:
             self.vitesse = Vector2(core.getMouseLeftClick()[0] - self.position.x, core.getMouseLeftClick()[1] - self.position.y)
-            self.vitesse = self.vitesse.normalize()
-            self.vitesse = self.vitesse*self.vitesseMax
+            if self.vitesse != Vector2(0, 0):
+                self.vitesse = self.vitesse.normalize()
+                self.vitesse = self.vitesse*self.vitesseMax
         if self.position.x+self.vitesse.x+self.rayon >= core.WINDOW_SIZE[0] or self.position.x+self.vitesse.x-self.rayon <= 0:
             self.vitesse.x = 0
         if self.position.y+self.vitesse.y+self.rayon >= core.WINDOW_SIZE[1] or self.position.y+self.vitesse.y-self.rayon <= 0:

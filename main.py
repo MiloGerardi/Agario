@@ -8,11 +8,12 @@ from interface import Interface
 
 
 def setup():
-    f = Fenetre()
-    f.defTaille(1000,800)
-    f.defFps(60)
-    f.defCouleur((255,255,255))
-    f.set(core)
+    core.memory("fenetre", Fenetre())
+    core.memory("fenetre").defTaille(1000,800)
+    core.memory("fenetre").defFps(60)
+    core.memory("fenetre").defCouleur((255,255,255))
+    core.memory("fenetre").set(core)
+
     core.memory("interface", Interface())
 
     core.memory("listcreep", [])
@@ -29,36 +30,43 @@ def setup():
     core.memory("listennemis")[1].setPosition(Vector2(50, core.WINDOW_SIZE[1]-50))
     core.memory("listennemis")[2].setPosition(Vector2(core.WINDOW_SIZE[0]-50, core.WINDOW_SIZE[1] - 50))
     core.memory("listennemis")[3].setPosition(Vector2(core.WINDOW_SIZE[0]-50,50))
+    core.memory("game", False)
 
 
 def run():
     core.cleanScreen()
-    for c in core.memory("listcreep"):
-        c.show(core.screen)
-    core.memory("joueur").calculRayon()
-    core.memory("joueur").calculVitesse()
-    core.memory("joueur").deplacer()
-    core.memory("joueur").afficher(core.screen)
-    creepEating(core.memory("joueur"), core.memory("listcreep"))
-    for i in core.memory("listennemis"):
-        i.calculRayon()
-        i.calculVitesse()
-        i.deplacer(core.memory("joueur"), core.memory("listcreep"))
-        i.afficher(core.screen)
-        creepEating(i, core.memory("listcreep"))
-    if playerEating(core.memory("joueur"), core.memory("listennemis"))!=None:
-        if type(playerEating(core.memory("joueur"), core.memory("listennemis"))) == Joueur:
-            gameOver()
-        else :
-            for i in range(len(core.memory("listennemis"))):
-                if core.memory("listennemis")[i] == playerEating(core.memory("joueur"), core.memory("listennemis")) :
-                    core.memory("joueur").addMass(core.memory("listennemis")[i].getMass())
-                    del core.memory("listennemis")[i]
-                    if len(core.memory("listennemis"))==0 :
-                        gameOver()
-                    break
+    if core.memory("game"):
+        for c in core.memory("listcreep"):
+            c.show(core.screen)
+        core.memory("joueur").calculRayon()
+        core.memory("joueur").calculVitesse()
+        core.memory("joueur").deplacer()
+        core.memory("joueur").afficher(core.screen)
+        creepEating(core.memory("joueur"), core.memory("listcreep"))
+        for i in core.memory("listennemis"):
+            i.calculRayon()
+            i.calculVitesse()
+            i.deplacer(core.memory("joueur"), core.memory("listcreep"))
+            i.afficher(core.screen)
+            creepEating(i, core.memory("listcreep"))
+        if playerEating(core.memory("joueur"), core.memory("listennemis"))!=None:
+            if type(playerEating(core.memory("joueur"), core.memory("listennemis"))) == Joueur:
+                gameOver(False)
+            else :
+                for i in range(len(core.memory("listennemis"))):
+                    if core.memory("listennemis")[i] == playerEating(core.memory("joueur"), core.memory("listennemis")) :
+                        core.memory("joueur").addMass(core.memory("listennemis")[i].getMass())
+                        del core.memory("listennemis")[i]
+                        if len(core.memory("listennemis"))==0 :
+                            gameOver(True)
+                        break
 
-    core.memory("interface").ingame(core.memory("joueur"), core.memory("listennemis"))
+        core.memory("interface").ingame(core.memory("joueur"), core.memory("listennemis"))
+    else:
+        if core.memory("interface").menu(core.memory("fenetre")):
+            core.memory("game", True)
+            core.memory("fenetre").defCouleur((255,255,255))
+            core.memory("fenetre").set(core)
 
 
 
@@ -87,9 +95,9 @@ def collide(circle_1, circle_2, tolerance):
     else:
         return False
 
-def gameOver():
+def gameOver(win):
+    core.memory("interface").endgame(win)
     core.noLoop()
-    print(core.memory("joueur").getMass())
 
 core.main(setup, run)
 

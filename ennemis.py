@@ -1,24 +1,15 @@
 from pygame.math import Vector2
-import pygame
+from joueur import Joueur
 import core
-import math
+import random
 
 
-class Ennemi:
+class Ennemi(Joueur):
     def __init__(self):
-        self.rayon = 0
-        self.position = Vector2(core.WINDOW_SIZE[0]/2,core.WINDOW_SIZE[1]/2)
-        self.masse = 200
-        self.couleur = (255,0,0)
-        self.vitesse = Vector2(0,0)
-        self.vitesseMax = 0
+        Joueur.__init__(self)
         self.target = Vector2(0,0)
-
-    def calculVitesse(self):
-        self.vitesseMax = 2.5-self.rayon/100
-
-    def afficher(self, surface):
-        pygame.draw.circle(surface, self.couleur, [int(self.position.x), int(self.position.y)], self.rayon)
+        self.nom = ""
+        self.couleur = (random.randint(0, 255),random.randint(0, 255),random.randint(0, 255))
 
     def deplacer(self, joueur, creeps):
         self.comportement(joueur, creeps)
@@ -32,14 +23,6 @@ class Ennemi:
             self.vitesse.y = 0
         self.remiseSurTerrain()
         self.position += self.vitesse
-    def calculRayon(self):
-        self.rayon = round(math.sqrt((self.masse*2)/3.14))
-    def addMass(self, m):
-        self.masse += m
-    def getRadius(self):
-        return self.rayon
-    def getPosition(self):
-        return self.position
     def distance(self, circle):
         return Vector2(self.position.x-circle.getPosition().x, self.position.y-circle.getPosition().y).magnitude()
     def mangerCreep(self, creeps):
@@ -62,14 +45,3 @@ class Ennemi:
             self.mangerCreep(creeps)
     def setPosition(self, p):
         self.position = p
-    def getMass(self):
-        return self.masse
-    def remiseSurTerrain(self):
-        if self.position.x-self.rayon<=0 :
-            self.position.x=self.rayon+1
-        elif self.position.x+self.rayon>=core.WINDOW_SIZE[0] :
-            self.position.x=core.WINDOW_SIZE[0]-self.rayon-1
-        if self.position.y-self.rayon<=0 :
-            self.position.y=self.rayon+1
-        elif self.position.y+self.rayon>=core.WINDOW_SIZE[1] :
-            self.position.y=core.WINDOW_SIZE[1]-self.rayon-1
